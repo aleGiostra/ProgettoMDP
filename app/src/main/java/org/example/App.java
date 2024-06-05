@@ -23,16 +23,16 @@ public class App {
         boolean flag = false;
         Scanner scanner = new Scanner(System.in);
         while(!flag){
-            System.out.println("Select the size of the track.\nS for small size, M for medium size or B for big size:");
+            System.out.println("Select the size of the track.\nS for small size, M for medium size or L for large size:");
             String input = scanner.nextLine();
             input = input.trim();
             input = input.toUpperCase();
-            if(!input.equals("S") && !input.equals("M") && !input.equals("B"))
+            if(!input.equals("S") && !input.equals("M") && !input.equals("L"))
                 System.out.println("Please type one of the available options");
             else flag = true;
-            if(input.equals("S")) trackFile = "Tracks\\SmallTrack.txt";
-            if(input.equals("M")) trackFile = "Tracks\\MediumTrack.txt";
-            if(input.equals("B")) trackFile = "Tracks\\BigTrack.txt";
+            if(input.equals("S")) trackFile = "C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\Tracks\\SmallTrack.txt";
+            if(input.equals("M")) trackFile = "C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\Tracks\\MediumTrack.txt";
+            if(input.equals("L")) trackFile = "C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\Tracks\\LargeTrack.txt";
         }
 
         //carico il tracciato e mi salvo le posizioni dei punti sulla linea di partenza
@@ -48,7 +48,7 @@ public class App {
 
         //carico i giocatori umani da caricare in partita dal parser player setup
         //mi restituisce i giocatori che devo aggiungere in partita
-        ArrayList<Player> tempPlayers = playersSetup("PlayerSetup.txt");
+        ArrayList<Player> tempPlayers = playersSetup("C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\PlayerSetup.txt");
         //li mescolo
         Collections.shuffle(tempPlayers);
         //li aggiungo in posizioni random nella linea di partenza
@@ -77,7 +77,7 @@ public class App {
             }while(!flag);
         }
 
-        int botPlayers = FilePlayersParser.botPlayersSetup("PlayerSetup.txt");
+        int botPlayers = FilePlayersParser.botPlayersSetup("C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\PlayerSetup.txt");
         int maxPlayers = track.getStartingLine().size() - gameEngine.getPlayers().size();
         if(botPlayers > maxPlayers) botPlayers = maxPlayers;
         if(botPlayers < 0) botPlayers = 0;

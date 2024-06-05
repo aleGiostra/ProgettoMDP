@@ -39,86 +39,119 @@ public class GameEngine {
         track.printTrack(players);
         int round = 0;
         while (raceOn) {
+            StringBuilder message = new StringBuilder();
+            System.out.println("\n\nStart of round " + (round+1)+"\n");
             for (Player player : players) {
                 if(player.getCar().isRunning()){
-                    System.out.println(player.getName() + "'s turn: ");
+                    if(player instanceof BotPlayer)
+                        System.out.println(player.getName() + " has made his move");
+                    else
+                        System.out.println(player.getName() + "'s turn: ");
+
                     //un giocatore alla volta in base all'ordine random stabilito fa la sua mossa
-                    player.move(track, round);
+                    message.append(player.move(track, round));
 
-                    //controllo se il giocatore è uscito dal tracciato
-                    if(!this.checkPosition(player))
-                        //controllo se ci sono incidenti
-                        if(!this.checkCollision(player))
-                            //controllo se il player è crashato su un ostacolo
-                            this.checkCollisionWithObstacle(player);
-
-                    //controllo se il giocatore è arrivato al traguardo
-                    if (track.getCell(player.getCar().getActualPosition().getX(), player.getCar().getActualPosition().getY()) == '_'
-                            && round > (this.getTrack().getXs()+this.getTrack().getYs())/2) {
-                        System.out.println(player.getName() + " wins the race!");
-                        raceOn = false;
-                        break;
-                    }
-                    track.printTrack(players);
                 }
-                //controllo se c'è ancora almeno un player in gara
-                boolean flagRunning = false;
-                for(Player playerRacing : players)
-                    if(playerRacing.getCar().isRunning()) flagRunning = true;
-                if(!flagRunning){
-                    System.out.println("Every player got eliminated from the race so RACE IS OVER WITH NO WINNER");
-                    raceOn = false;
-                    break;
+            }//fine round
+            //effettuo i vari controlli
+            String checkEsit = "";
+            for(Player player : players){
+                if(player.getCar().isRunning()){
+                    //controllo se il giocatore è uscito dal tracciato
+                    checkEsit = this.checkPosition(player);
+                    if(!checkEsit.isEmpty()){
+                        message.append(checkEsit);
+                    }else {
+                        //controllo se ci sono incidenti
+                        checkEsit = this.checkCollision(player);
+                        if(!checkEsit.isEmpty())
+                            message.append(checkEsit);
+                        else{//controllo se il player è crashato su un ostacolo
+                            checkEsit = this.checkCollisionWithObstacle(player);
+                            message.append(checkEsit);
+                        }
+                    }
                 }
             }
-            displayRaceProgress();
+
+            //controllo se il giocatore è arrivato al traguardo
+            int haveWon = 0;//number of players who have arrived at the finish line on the same round
+            String[] winners = new String[players.size()];//idea: string with the names of every player who won
+            for(Player player : players){
+                if (track.getCell(player.getCar().getActualPosition().getX(), player.getCar().getActualPosition().getY()) == '_'
+                        && round > (this.getTrack().getXs()+this.getTrack().getYs())/2) {
+                    //format the string to print based on who and how many won
+                    winners[haveWon++] = player.getName();
+                }
+            }
+            if(haveWon == 1){
+                message.append(winners[0]).append(" wins the race!\n");
+                break;
+            }else if(haveWon > 1){
+                for(int i = 0; i < winners.length; i++){
+                    if(i != winners.length - 1)
+                        message.append(winners[i] + " and ");
+                    else message.append(winners[i]);
+                }
+                message.append(" have won the race together!!!");
+                break;
+            }
+
+            System.out.println("\nRound " + (round+1) + " moves:\n" + message);
+            //controllo se c'è ancora almeno un player in gara
+            boolean flagRunning = false;
+            for(Player playerRacing : players)
+                if(playerRacing.getCar().isRunning()) flagRunning = true;
+            if(!flagRunning){
+                System.out.println("Every player got eliminated from the race.\nRACE IS OVER WITH NO WINNER");
+                raceOn = false;
+            }
+            track.printTrack(players);
+            //displayRaceProgress();
             round++;
         }
     }
 
     //il metodo viene chiamato dopo ogni mossa, controlla se il player è uscito dal tracciato
-    public boolean checkPosition(Player player) throws ArrayIndexOutOfBoundsException{
+    public String checkPosition(Player player) throws ArrayIndexOutOfBoundsException{
         try{
             if(track.getCell(player.getCar().getActualPosition().getX(), player.getCar().getActualPosition().getY()) == '#'){
-                System.out.println("The car went out of track!");
                 player.getCar().setRunning(false);
-                return true;
+                return player.getName() + "'s car went out of track!\n";
             }
-            return false;
+            return "";
         }catch (ArrayIndexOutOfBoundsException e){
             if(player.getCar().getActualPosition().getX() < 0) player.getCar().getActualPosition().setX(0);
             if(player.getCar().getActualPosition().getY() < 0) player.getCar().getActualPosition().setY(0);
             if(player.getCar().getActualPosition().getX() > track.getXs()) player.getCar().getActualPosition().setX(track.getXs()-1);
             if(player.getCar().getActualPosition().getY() > track.getYs()) player.getCar().getActualPosition().setY(track.getYs()-1);
             checkPosition(player);
-            return true;
+            return player.getName() + "'s car went out of track!\n";
         }
     }
 
     //il metodo viene chiamato dopo ogni mossa, controlla se il player che ha fatto la mossa è andato a sbattere con altri player
-    public boolean checkCollision(Player player){
-        int playerX = player.getCar().getActualPosition().getX();
-        int playerY = player.getCar().getActualPosition().getY();
+    public String checkCollision(Player player){
+        Position playerPosition = player.getCar().getActualPosition();
         for(Player player2 : players){
-            int player2X = player2.getCar().getActualPosition().getX();
-            int player2Y = player2.getCar().getActualPosition().getY();
-            if(player.getId() != player2.getId() && (playerX == player2X && playerY == player2Y) && player2.getCar().isRunning()){
+            Position player2Position = player2.getCar().getActualPosition();
+            if(player.getId() != player2.getId() && (playerPosition.equals(player2Position)) && player2.getCar().isRunning()){
                 player.getCar().setRunning(false);
                 player2.getCar().setRunning(false);
-                System.out.println("Player " + player.getName() + " and player " + player2.getName() +
-                        " were eliminated due to collision");
-                this.track.setCell(playerX, playerY, 'x');
-                return true;
+                this.track.setCell(playerPosition.getX(), playerPosition.getY(), 'x');
+                return "Player " + player.getName() + " and player " + player2.getName() +
+                        " were eliminated due to collision\n";
             }
         }
-        return false;
+        return "";
     }
 
-    public void checkCollisionWithObstacle(Player player){
+    public String checkCollisionWithObstacle(Player player){
         if(track.getCell(player.getCar().getActualPosition().getX(), player.getCar().getActualPosition().getY()) == 'x'){
             player.getCar().setRunning(false);
-            System.out.println(player.getName() + " has crashed into an obstacle");
+            return player.getName() + " has crashed into an obstacle\n";
         }
+        return "";
     }
 
     public void displayRaceProgress() {

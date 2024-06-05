@@ -15,5 +15,5 @@ public abstract class Player {
     public String getName(){ return name; }
     public Car getCar(){ return car; }
 
-    public abstract void move(Track track, int round);
+    public abstract String move(Track track, int round);
 }

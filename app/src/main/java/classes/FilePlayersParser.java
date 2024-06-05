@@ -11,8 +11,7 @@ public class FilePlayersParser {
         //leggo il numero di bot da inserire
         int nBot = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
-            String line = "";
-            line = br.readLine().trim();
+            String line = br.readLine().trim();
             nBot = Integer.parseInt(line);
         }catch (IOException | NumberFormatException e){
             e.printStackTrace();
@@ -25,14 +24,11 @@ public class FilePlayersParser {
         ArrayList<Player> players = new ArrayList<Player>();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
             String line;
-            List<String> lines = new ArrayList<>();
+            //List<String> lines = new ArrayList<>();
+            line = br.readLine();
             while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-            int rows = lines.size();
-            for (int i = 1; i < rows; i++) {
-                char id = lines.get(i).charAt(0);
-                String name = lines.get(i).substring(2);
+                char id = line.toUpperCase().charAt(0);
+                String name = line.substring(2);
                 players.add(new HumanPlayer(id, name, null));
             }
         }catch (IOException e){

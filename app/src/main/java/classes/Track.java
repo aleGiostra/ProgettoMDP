@@ -25,7 +25,7 @@ public class Track {
     public void addStartingPoint(int x, int y){ this.startingLine.add(new Position(x, y)); }
 
     //stampa il tracciato con i player nelle loro posizioni attuali
-    public void printTrack(ArrayList<Player> players) {//TODO fix print
+    public void printTrack(ArrayList<Player> players) {
         //stampo una riga per le coordinate x
         System.out.print("   ");
         //i indicizza le colonne quindi x
