@@ -1,6 +1,7 @@
 package classes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Car {
 
@@ -9,7 +10,7 @@ public class Car {
 
     //starts with starting position, with every move the new position occupied will be added
     //last element is actual position
-    private ArrayList<Position> positionLog;
+    private List<Position> positionLog;
     private boolean running;
 
     public Car(){}

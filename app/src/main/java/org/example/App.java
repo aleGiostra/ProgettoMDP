@@ -4,107 +4,15 @@
 package org.example;
 
 import classes.*;
-import org.checkerframework.checker.units.qual.A;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-import java.util.Scanner;
-
-import static classes.FilePlayersParser.playersSetup;
-import static classes.FileTrackParser.loadTrackFromFile;
+import classes.Controllers.SetupController;
 
 public class App {
 
     public static void main(String[] args) {
+        SetupController setupController = new SetupController();
+        setupController.gameSetup();
 
-        //faccio scegliere all'utente il tracciato da caricare tra quelli disponibili
-        String trackFile = "";
-        boolean flag = false;
-        Scanner scanner = new Scanner(System.in);
-        while(!flag){
-            System.out.println("Select the size of the track.\nS for small size, M for medium size or L for large size:");
-            String input = scanner.nextLine();
-            input = input.trim();
-            input = input.toUpperCase();
-            if(!input.equals("S") && !input.equals("M") && !input.equals("L"))
-                System.out.println("Please type one of the available options");
-            else flag = true;
-            if(input.equals("S")) trackFile = "C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\Tracks\\SmallTrack.txt";
-            if(input.equals("M")) trackFile = "C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\Tracks\\MediumTrack.txt";
-            if(input.equals("L")) trackFile = "C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\Tracks\\LargeTrack.txt";
-        }
-
-        //carico il tracciato e mi salvo le posizioni dei punti sulla linea di partenza
-        Track track = loadTrackFromFile(trackFile);
-        GameEngine gameEngine = new GameEngine(track);
-        System.out.print("Track loaded, Starting Line at:");
-        for(int i = 0; i < track.getStartingLine().size(); i++){
-            System.out.print(" [" + track.getStartingLine().get(i).getX() + ", " + track.getStartingLine().get(i).getY() + "]");
-            if(i < track.getStartingLine().size()-1) System.out.print(",");
-        }
-
-        System.out.println();
-
-        //carico i giocatori umani da caricare in partita dal parser player setup
-        //mi restituisce i giocatori che devo aggiungere in partita
-        ArrayList<Player> tempPlayers = playersSetup("C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\PlayerSetup.txt");
-        //li mescolo
-        Collections.shuffle(tempPlayers);
-        //li aggiungo in posizioni random nella linea di partenza
-        for(Player player : tempPlayers){
-            Random random = new Random();
-            int x = -1;
-            //prendo un player e una posizione random nella linea di partenza
-            do{
-                flag = true;
-                x = random.nextInt(gameEngine.getTrack().getStartingLine().size());
-                //controllo se tra i player in game ce n'è uno che occupa la posizione
-                for(Player player2 : gameEngine.getPlayers()){
-                    if(gameEngine.getTrack().getStartingLine().get(x).equals(player2.getCar().getActualPosition())){
-                        flag = false;
-                        break;
-                    }
-                }
-                //se flag è ancora vero la posizione era libera, inserisco il player
-                if(flag){
-                    gameEngine.getPlayers().add(new HumanPlayer(player.getId(), player.getName(), new Car(gameEngine.getTrack().getStartingLine().get(x))));
-                    System.out.println("A player was added to the game: " + player.getName() + ", starting position: [" +
-                            gameEngine.getTrack().getStartingLine().get(x).getX() + ", " +
-                            gameEngine.getTrack().getStartingLine().get(x).getY() + "]");
-                }
-                //se flag è falso, la posizione era occupata e ne provo un'altra
-            }while(!flag);
-        }
-
-        int botPlayers = FilePlayersParser.botPlayersSetup("C:\\Users\\alegi\\MdP\\bozzaProgettoMdP\\PlayerSetup.txt");
-        int maxPlayers = track.getStartingLine().size() - gameEngine.getPlayers().size();
-        if(botPlayers > maxPlayers) botPlayers = maxPlayers;
-        if(botPlayers < 0) botPlayers = 0;
-
-        //posiziono i bot sulla linea di partenza man mano che li creo
-        int idBot = 0;
-        for(int i = 0; i < botPlayers;){
-            //cerco punto di partenza libero
-            for(Position p : gameEngine.getTrack().getStartingLine()){
-                flag = true;//true = posizione libera
-                for(Player player : gameEngine.getPlayers()){
-                    if(player.getCar().getActualPosition().equals(p)){
-                        flag = false;//posizione occupata
-                        break;
-                    }
-                }
-                if(flag){
-                    char idBotC = (char) (++idBot + '0');
-                    gameEngine.addPlayer(new BotPlayer(idBotC,"Bot"+(idBot), new Car(p)));
-                    System.out.println("New Bot" + (idBot) +" player added at (" + p.getX() + ", " + p.getY() + ")");
-                    i++;
-                    break;
-                }
-            }
-        }
-
-        //inizio gara
+        GameEngine gameEngine = new GameEngine(setupController.getTrack(), setupController.getPlayers());
         gameEngine.startRace();
     }
 }

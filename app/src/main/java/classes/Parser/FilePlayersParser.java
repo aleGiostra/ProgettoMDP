@@ -1,4 +1,7 @@
-package classes;
+package classes.Parser;
+
+import classes.Player.HumanPlayer;
+import classes.Player.Player;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,13 +21,12 @@ public class FilePlayersParser {
         }
         return nBot;
     }
-    public static ArrayList<Player> playersSetup(String fileName){
+    public static List<Player> playersSetup(String fileName){
         //leggo il file di setup dei giocatori
         //il file ha forma : 1 riga = 1 player -> id name
-        ArrayList<Player> players = new ArrayList<Player>();
+        List<Player> players = new ArrayList<Player>();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
             String line;
-            //List<String> lines = new ArrayList<>();
             line = br.readLine();
             while ((line = br.readLine()) != null) {
                 char id = line.toUpperCase().charAt(0);

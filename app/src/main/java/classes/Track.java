@@ -1,31 +1,45 @@
 package classes;
 
+import classes.Player.Player;
+
 import java.util.ArrayList;
+import java.util.List;
 
-public class Track {
+public class Track implements iTrack{
 
-    private char[][] grid;
-    private ArrayList<Position> startingLine;
-    private Direction firstMoveDirection;
+    private final char[][] grid;
+    private List<Position> startingLinePoints;
+    private List<Position> finishLinePoints;
+    private final Direction firstMoveDirection;
+    private final int minMovesToFinish;
 
     public Track(int x, int y, Direction direction) {
         this.grid = new char[x][y];
-        startingLine = new ArrayList<Position>();
+        startingLinePoints = new ArrayList<>();
+        finishLinePoints = new ArrayList<>();
         this.firstMoveDirection = direction;
+        if(x < y) minMovesToFinish = (int) ((double) x /2 * 0.75 * 3.14 / 2);
+        else minMovesToFinish = (int) ((double) y /2 * 0.75 * 3.14 / 2);
     }
 
     public char getCell(int x, int y){ return this.grid[x][y]; }
-    public ArrayList<Position> getStartingLine(){ return this.startingLine; }
-    public int getXs(){ return grid.length; }//ascissa (x)
-    public int getYs(){ return grid[0].length; }//ordinata (y)
-    public Direction getFirstMoveDirection(){ return this.firstMoveDirection; }
-
     public void setCell(int x, int y, char value){ this.grid[x][y] = value; }
 
-    public void addStartingPoint(int x, int y){ this.startingLine.add(new Position(x, y)); }
+    public List<Position> getStartingLinePoints(){ return this.startingLinePoints; }
+    public void addStartingPoint(int x, int y){ this.startingLinePoints.add(new Position(x, y)); }
+
+    public int getXs(){ return grid.length; }//ascissa (x)
+    public int getYs(){ return grid[0].length; }//ordinata (y)
+
+    public Direction getFirstMoveDirection(){ return this.firstMoveDirection; }
+    public int getMinMovesToFinish(){ return this.minMovesToFinish; }
+
+    public List<Position> getFinishLinePoints(){ return this.finishLinePoints; }
+    public void setFinishLinePoints(List<Position> linePoints){ this.finishLinePoints = linePoints; }
+    public void addFinishLinePoint(int x, int y){ this.finishLinePoints.add(new Position(x, y)); }
 
     //stampa il tracciato con i player nelle loro posizioni attuali
-    public void printTrack(ArrayList<Player> players) {
+    public void printTrack(List<Player> players) {
         //stampo una riga per le coordinate x
         System.out.print("   ");
         //i indicizza le colonne quindi x

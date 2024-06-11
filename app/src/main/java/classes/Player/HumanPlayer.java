@@ -1,13 +1,26 @@
-package classes;
+package classes.Player;
+
+import classes.Car;
+import classes.Position;
+import classes.Track;
 
 import java.util.Scanner;
 
-public class HumanPlayer extends Player{
+public class HumanPlayer implements Player {
+
+    private char id;
+    private Car car;
+    private String name;
 
     public HumanPlayer(char id, String name, Car car) {
-        super(id, name);
+        this.id = id;
+        this.name = name;
         this.car = car;
     }
+
+    public char getId(){ return id; }
+    public String getName(){ return name; }
+    public Car getCar(){ return car; }
 
     @Override
     public String move(Track track, int round) {

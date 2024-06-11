@@ -1,5 +1,9 @@
 package classes;
 
+import classes.Player.Player;
+
+import java.util.List;
+
 public class Position {
 
     private int x;//colonna, ascissa
@@ -16,7 +20,7 @@ public class Position {
     public void setY(int y){ this.y = y; }
 
     public Position dirModifier(int i){
-        return switch (i) {//(0,0) is top left so lowering y the pointer goes up
+        return switch (i) {
             case 0 ->//x+0,y+0 -> CENTER
                     this;
             case 1 ->//x+0,y-1 -> TOP
@@ -37,6 +41,13 @@ public class Position {
                     new Position(this.getX() - 1, this.getY() - 1);
             default -> null;
         };
+    }
+
+    public boolean isFree(List<Player> players){
+        for(Player player : players)
+            if(this.equals(player.getCar().getActualPosition()))
+                return false;
+        return true;
     }
 
     @Override

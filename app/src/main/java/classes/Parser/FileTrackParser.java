@@ -1,10 +1,11 @@
-package classes;
+package classes.Parser;
+
+import classes.Direction;
+import classes.Track;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class FileTrackParser {
     public static Track loadTrackFromFile(String fileName) {
@@ -15,7 +16,6 @@ public class FileTrackParser {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             String[] infoLine;
-            //List<String> lines = new ArrayList<>();
             if((line = br.readLine()) != null){
                 infoLine = line.split(" ");
                 Direction direction = Direction.valueOf(infoLine[0].trim().toUpperCase());
@@ -29,19 +29,14 @@ public class FileTrackParser {
                         track.setCell(x, y, line.charAt(x));
                         if (line.charAt(x) == '_')
                             track.addStartingPoint(x, y);
+                        if(line.charAt(x) == '*')
+                            track.addFinishLinePoint(x, y);
                     }
                     y++;
                 }
             }
-            //System.out.println("Grid dimensions : x = " + cols + ", y = " + rows);
-
-            //for (int y = 1; y <= rows; y++) {//scorro le righe quindi y
-            //    for (int x = 0; x < cols; x++) {//scorro le colonne quindi x
-            //        track.setCell(x, y-1, lines.get(y).charAt(x));
-            //        if(lines.get(y).charAt(x) == '_')
-            //            track.addStartingPoint(x, y-1);
-            //    }
-            //}
+            if(track.getFinishLinePoints().isEmpty())
+                track.setFinishLinePoints(track.getStartingLinePoints());
         } catch (IOException e) {
             e.printStackTrace();
         }
